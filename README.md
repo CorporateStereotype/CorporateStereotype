@@ -4,7 +4,7 @@
 
 All of the repositories are explorations of quantum curcuit models.
 
-The mathematical framework is based on a unique eqation that I call the Formula for Zero.
+The mathematical framework is based on a unique equation that I call the Formula for Zero.
 The author's name (Flint Adkins). The title of the work (Formula For Zero: Unified Theoretical Framework - Grand Unified Theory of Nothing).
 
 A citation link to the https://doi.org/10.17605/OSF.IO/3TN7F or the source where more work is hosted.
