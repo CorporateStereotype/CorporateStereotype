@@ -17,3 +17,4 @@ ZSG implements what I call as the "Eposodic Iterative Workflow" (EIW). It's a pr
 CorporateStereotype/CorporateStereotype is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 You can click the Preview link to take a look at your changes.
 --->
+![image](https://github.com/user-attachments/assets/ac7a775b-dfa2-4bf1-b2a1-a82a4a34a0a2)
