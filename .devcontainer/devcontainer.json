@@ -1,0 +1,5 @@
+{
+  "name": "QAIMultiTrainer-devcontainer",
+ "image": "mcr.microsoft.com/devcontainers/base:ubuntu",  // Any generic, debian-based image.
+  "features": {}
+}
