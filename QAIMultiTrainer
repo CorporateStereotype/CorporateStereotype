@@ -1,0 +1,487 @@
+
+#!pip install qiskit
+#!pip install tensorflow
+#!pip install qiskit_aer
+     
+
+from qiskit_aer import Aer # Import Aer from qiskit_aer
+from qiskit.visualization import plot_histogram
+
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras import Input
+from qiskit import QuantumCircuit, transpile, assemble
+from qiskit.quantum_info import Statevector
+import matplotlib.pyplot as plt
+     
+
+# 🔥 Quantum AI General Intelligence FFZ Training Portal
+# Full Version - With Adaptive LR Fix & Quantum Synchronization
+
+# 🎯 FFZ Stabilizer for Gradient Scaling
+class FFZStabilizer:
+    epsilon = 1e-8  # Prevent division by zero
+
+    @staticmethod
+    def stabilize_gradient(gradient):
+        """Stabilize gradients to prevent runaway values."""
+        return gradient / (np.sqrt(np.abs(gradient)) + FFZStabilizer.epsilon)
+
+# 🎯 Quantum Synchronizer with Phase-Enhanced Scaling
+class QuantumSynchronizer:
+    @staticmethod
+    def entangle_qubits(num_qubits):
+        """Generate entangled qubits for synchronization."""
+        circuit = QuantumCircuit(num_qubits)
+        circuit.h(0)  # Apply Hadamard to create superposition
+        for i in range(1, num_qubits):
+            circuit.cx(0, i)  # Create entanglement
+        statevector = Statevector.from_instruction(circuit)
+        return statevector.data  # Return the quantum state as an array
+
+    @staticmethod
+    def synchronize_gradients(classical_gradients):
+        """Synchronize gradients using quantum metadata with phase shifts."""
+        quantum_data = QuantumSynchronizer.entangle_qubits(len(classical_gradients))
+        scaling_factor = np.max(np.abs(quantum_data))
+
+        phase_adjusted_gradients = [
+            np.real(classical_gradients[i] * (np.abs(quantum_data[i]) / scaling_factor) * 1.2 + 1e-2)
+            for i in range(len(classical_gradients))
+        ]
+        print(f"Synchronized Gradients: {phase_adjusted_gradients}")
+        return phase_adjusted_gradients
+
+# 🎯 AI Agent (Client)
+class Agent:
+    def __init__(self, name):
+        self.name = name
+        self.weights = np.random.randn(10)  # Initialize weights
+        self.weights_history = []  # Track weight history for visualization
+        self.gradient_history = []  # Track gradients for stability visualization
+        self.lr_history = []  # Track learning rate evolution
+
+    def compute_gradient(self):
+        """Simulate gradient computation with variability."""
+        return np.random.randn(10) * np.random.uniform(0.5, 1.5)
+
+    def apply_gradient(self, gradient):
+        """Apply computed gradient to weights."""
+        adaptive_lr = max(0.01, min(0.3, np.linalg.norm(gradient) * 0.1))  # 🔥 Improved LR Scaling
+        self.weights -= adaptive_lr * gradient.real  # Apply gradient update
+        self.weights_history.append(self.weights.copy())  # Track weights
+        self.gradient_history.append(np.linalg.norm(gradient))  # Track gradient magnitude
+        self.lr_history.append(adaptive_lr)  # Track per-client LR evolution
+        print(f"{self.name} updated weights: {self.weights}, LR: {adaptive_lr}")
+
+# 🎯 Hybrid Controller (Federated Aggregation + Quantum Sync)
+class HybridController:
+    def __init__(self, agents, use_quantum=True):
+        self.agents = agents
+        self.use_quantum = use_quantum
+        self.agent_gradients = []
+
+    def synchronize_training(self):
+        """Synchronize gradients across all agents."""
+        self.agent_gradients.clear()
+        for agent in self.agents:
+            gradient = FFZStabilizer.stabilize_gradient(agent.compute_gradient())
+            self.agent_gradients.append(gradient)
+
+        if self.use_quantum:
+            self.agent_gradients = QuantumSynchronizer.synchronize_gradients(self.agent_gradients)
+
+    def optimize(self):
+        """Optimize weights for all agents."""
+        for agent, gradient in zip(self.agents, self.agent_gradients):
+            agent.apply_gradient(gradient)
+
+# 🎯 Visualization: Weight Evolution Over Rounds
+def plot_weight_changes(agents, rounds):
+    plt.figure(figsize=(12, 6))
+    colors = plt.cm.viridis(np.linspace(0, 1, len(agents)))
+    for agent_idx, agent in enumerate(agents):
+        weights = np.array(agent.weights_history)
+        for i in range(weights.shape[1]):
+            plt.plot(range(rounds), weights[:, i], color=colors[agent_idx], alpha=0.6, label=f"{agent.name}" if i == 0 else "")
+    plt.title("Weight Evolution Over Rounds")
+    plt.xlabel("Rounds")
+    plt.ylabel("Weight Values")
+    plt.legend(loc="upper left", bbox_to_anchor=(1, 1), fontsize="small")
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.tight_layout()
+    plt.show()
+
+# 🎯 Performance Metrics: Track Gradient Magnitude Over Time
+def plot_gradient_magnitude(agents, rounds):
+    plt.figure(figsize=(10, 5))
+    for agent in agents:
+        plt.plot(range(rounds), agent.gradient_history, label=f"{agent.name}")
+    plt.title("Gradient Magnitude Over Training Rounds")
+    plt.xlabel("Rounds")
+    plt.ylabel("Gradient Magnitude")
+    plt.legend()
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.show()
+
+# 🎯 Learning Rate Heatmap
+def plot_lr_heatmap(agents):
+    plt.figure(figsize=(10, 5))
+    for agent in agents:
+        plt.plot(agent.lr_history, label=f"{agent.name}")
+    plt.title("Learning Rate Evolution")
+    plt.xlabel("Rounds")
+    plt.ylabel("Learning Rate")
+    plt.legend()
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.show()
+
+# 🚀 Main Execution
+if __name__ == "__main__":
+    num_clients = 5
+    num_rounds = 5
+    agents = [Agent(f"Client {i+1}") for i in range(num_clients)]
+    controller = HybridController(agents, use_quantum=True)
+
+    for round_num in range(num_rounds):
+        print(f"\n=== Round {round_num + 1} ===")
+        controller.synchronize_training()
+        controller.optimize()
+
+    # ✅ Visualize weight evolution
+    plot_weight_changes(agents, num_rounds)
+
+    # ✅ Visualize gradient stability
+    plot_gradient_magnitude(agents, num_rounds)
+
+    # ✅ Visualize learning rate evolution
+    plot_lr_heatmap(agents)
+
+
+# 🔥 Quantum AI General Intelligence FFZ Training Portal
+# Full Version - With Adaptive LR Fix & Quantum Synchronization
+# 🎯 FFZ Stabilizer for Gradient Scaling
+class FFZStabilizer:
+    epsilon = 1e-8  # Prevent division by zero
+
+    @staticmethod
+    def stabilize_gradient(gradient):
+        """Stabilize gradients to prevent runaway values."""
+        return gradient / (np.sqrt(np.abs(gradient)) + FFZStabilizer.epsilon)
+
+# 🎯 Adaptive Quantum Synchronizer: Ensure ALL Clients Get Meaningful Gradients
+class QuantumSynchronizer:
+    @staticmethod
+    def entangle_qubits(num_qubits):
+        """Generate entangled qubits for synchronization."""
+        circuit = QuantumCircuit(num_qubits)
+        circuit.h(0)  # Apply Hadamard to create superposition
+        for i in range(1, num_qubits):
+            circuit.cx(0, i)  # Create entanglement
+        statevector = Statevector.from_instruction(circuit)
+        return statevector.data
+
+    @staticmethod
+    def synchronize_gradients(classical_gradients):
+        """Ensure all clients receive meaningful gradient values."""
+        quantum_data = QuantumSynchronizer.entangle_qubits(len(classical_gradients))
+        scaling_factor = np.max(np.abs(quantum_data))
+
+        # 🔥 Fix: Prevent Clients 2-5 from getting only 0.01
+        adjusted_gradients = [
+            classical_gradients[i] * (np.abs(quantum_data[i]) / scaling_factor) * 1.2 + np.random.uniform(0.02, 0.1)
+            for i in range(len(classical_gradients))
+        ]
+
+        print(f"Synchronized Gradients: {adjusted_gradients}")
+        return adjusted_gradients
+
+# 🎯 AI Agent (Client) with FIXED Adaptive Learning Rate Scaling
+class Agent:
+    def __init__(self, name):
+        self.name = name
+        self.weights = np.random.randn(10)
+        self.velocity = np.zeros(10)  # Momentum buffer
+        self.weights_history = []
+        self.gradient_history = []
+        self.lr_history = []
+
+    def compute_gradient(self):
+        """Simulate gradient computation with added variance."""
+        return np.random.randn(10) * np.random.uniform(0.8, 1.5)
+
+    def apply_gradient(self, gradient):
+        """Apply computed gradient with adaptive LR + momentum."""
+        gradient_magnitude = np.linalg.norm(gradient)
+        adaptive_lr = max(0.02, min(0.3, gradient_magnitude * 0.2))
+
+        # Momentum-based weight update (β = 0.9)
+        beta = 0.9
+        self.velocity = beta * self.velocity - adaptive_lr * gradient
+        self.weights += self.velocity
+
+        self.weights_history.append(self.weights.copy())
+        self.gradient_history.append(gradient_magnitude)
+        self.lr_history.append(adaptive_lr)
+
+        print(f"{self.name} updated weights: {self.weights}, LR: {adaptive_lr}")
+
+class TrainingController:
+    def __init__(self, clients):
+        self.clients = clients
+        self.num_clients = len(clients)
+
+    def rotate_clients(self):
+        """Rotate the list of clients so that each gets a turn as the first client."""
+        self.clients = self.clients[1:] + [self.clients[0]]  # Move first client to the end
+
+    def train(self, num_rounds):
+        for round_num in range(num_rounds):
+            print(f"\n=== Round {round_num + 1} ===")
+
+            # Apply gradients and update weights
+            for client in self.clients:
+                gradient = np.random.randn(10)  # Simulated gradient
+                client.apply_gradient(gradient, round_num)
+
+            self.rotate_clients()  # Rotate clients at the end of each round
+
+
+# 🎯 Hybrid Controller (Federated Aggregation + Quantum Sync)
+class HybridController:
+    def __init__(self, agents, use_quantum=True):
+        self.agents = agents
+        self.use_quantum = use_quantum
+        self.agent_gradients = []
+
+    def synchronize_training(self):
+        """Synchronize gradients across all agents."""
+        self.agent_gradients.clear()
+        for agent in self.agents:
+            gradient = FFZStabilizer.stabilize_gradient(agent.compute_gradient())
+            self.agent_gradients.append(gradient)
+
+        if self.use_quantum:
+            self.agent_gradients = QuantumSynchronizer.synchronize_gradients(self.agent_gradients)
+
+    def optimize(self):
+        """Optimize weights for all agents."""
+        for agent, gradient in zip(self.agents, self.agent_gradients):
+            agent.apply_gradient(gradient)
+
+# 🎯 Visualization: Weight Evolution Over Rounds
+def plot_weight_changes(agents, rounds):
+    plt.figure(figsize=(12, 6))
+    colors = plt.cm.viridis(np.linspace(0, 1, len(agents)))
+    for agent_idx, agent in enumerate(agents):
+        weights = np.array(agent.weights_history)
+        for i in range(weights.shape[1]):
+            plt.plot(range(rounds), weights[:, i], color=colors[agent_idx], alpha=0.6, label=f"{agent.name}" if i == 0 else "")
+    plt.title("Weight Evolution Over Rounds")
+    plt.xlabel("Rounds")
+    plt.ylabel("Weight Values")
+    plt.legend(loc="upper left", bbox_to_anchor=(1, 1), fontsize="small")
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.tight_layout()
+    plt.show()
+
+# 🎯 Performance Metrics: Track Gradient Magnitude Over Time
+def plot_gradient_magnitude(agents, rounds):
+    plt.figure(figsize=(10, 5))
+    for agent in agents:
+        plt.plot(range(rounds), agent.gradient_history, label=f"{agent.name}")
+    plt.title("Gradient Magnitude Over Training Rounds")
+    plt.xlabel("Rounds")
+    plt.ylabel("Gradient Magnitude")
+    plt.legend()
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.show()
+
+# 🎯 Learning Rate Heatmap
+def plot_lr_heatmap(agents):
+    plt.figure(figsize=(10, 5))
+    for agent in agents:
+        plt.plot(agent.lr_history, label=f"{agent.name}")
+    plt.title("Learning Rate Evolution")
+    plt.xlabel("Rounds")
+    plt.ylabel("Learning Rate")
+    plt.legend()
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.show()
+
+# 🚀 Main Execution
+if __name__ == "__main__":
+    num_clients = 5
+    num_rounds = 30
+    agents = [Agent(f"Client {i+1}") for i in range(num_clients)]
+    controller = HybridController(agents, use_quantum=True)
+
+    for round_num in range(num_rounds):
+        print(f"\n=== Round {round_num + 1} ===")
+        controller.synchronize_training()
+        controller.optimize()
+
+    # ✅ Visualize weight evolution
+    plot_weight_changes(agents, num_rounds)
+
+    # ✅ Visualize gradient stability
+    plot_gradient_magnitude(agents, num_rounds)
+
+    # ✅ Visualize learning rate evolution
+    plot_lr_heatmap(agents)
+
+     # Create a quantum circuit for entanglement
+def create_entangled_pair():
+    qc = QuantumCircuit(2)
+    qc.h(0)  # Apply Hadamard gate
+    qc.cx(0, 1)  # Apply CNOT gate
+    qc.measure_all()
+    return qc
+
+# Simulate the circuit
+def simulate_entanglement():
+    simulator = Aer.get_backend('aer_simulator')
+    qc = create_entangled_pair()
+    compiled_qc = transpile(qc, simulator)
+    # Execute the transpiled circuit directly
+    result = simulator.run(compiled_qc).result()
+    counts = result.get_counts()
+    return counts
+
+# Simulate and print the entangled state outcomes
+entangled_outcomes = simulate_entanglement()
+print("Entangled Outcomes:", entangled_outcomes)
+
+     
+#Entangled Outcomes: {'11': 495, '00': 529}
+
+# Simulated federated learning setup
+def create_model():
+    model = Sequential([
+        Dense(128, activation='relu', input_shape=(784,)),
+        Dense(10, activation='softmax')
+    ])
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    return model
+
+# Simulated client update
+def simulate_client_update(global_model, data, quantum_metadata):
+    # Get the current weights of the model
+    current_weights = global_model.get_weights()
+
+    # Apply quantum metadata for synchronization only to the first layer
+    synchronized_grad = quantum_metadata * np.random.rand(*current_weights[0].shape)
+    updated_first_layer_weights = current_weights[0] + synchronized_grad
+
+    # Update the weights of the first layer
+    new_weights = [updated_first_layer_weights] + current_weights[1:]
+
+    # Set the updated weights back to the model
+    global_model.set_weights(new_weights)
+    return global_model
+
+# Simulated quantum metadata
+quantum_metadata = np.random.rand()
+
+# Example usage
+global_model = create_model()
+global_model = simulate_client_update(global_model, data=None, quantum_metadata=quantum_metadata)
+print("Updated Model Weights:", global_model.get_weights()[0])
+
+def create_entangled_pair():
+    """Create a quantum circuit for entangled qubits."""
+    qc = QuantumCircuit(2)
+    qc.h(0)  # Hadamard gate on qubit 0
+    qc.cx(0, 1)  # CNOT gate
+    qc.measure_all()
+    return qc
+
+def simulate_entanglement():
+    """Simulate entanglement and return measurement results."""
+    simulator = Aer.get_backend('aer_simulator')
+    qc = create_entangled_pair()
+    compiled_qc = transpile(qc, simulator)
+    # The assemble function is not needed for this type of simulation
+    # Instead, directly run the compiled circuit
+    result = simulator.run(compiled_qc).result()
+    counts = result.get_counts()
+    return counts
+
+# Example simulation
+entangled_outcomes = simulate_entanglement()
+print("Entangled Outcomes:", entangled_outcomes)
+     
+#Entangled Outcomes: {'00': 518, '11': 506}
+
+def create_model():
+    """Create a simple neural network model."""
+    model = Sequential([
+        Dense(128, activation='relu', input_shape=(784,)),
+        Dense(10, activation='softmax')
+    ])
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    return model
+def simulate_client_update(global_model, quantum_metadata):
+    """Simulate client updates with quantum synchronization."""
+    # Retrieve current weights
+    current_weights = global_model.get_weights()
+
+    # Apply quantum synchronization gradient to each layer
+    updated_weights = []
+    for weight in current_weights:
+        # Generate synchronized gradient with the same shape as the layer weights
+        synchronized_grad = quantum_metadata * np.random.rand(*weight.shape)
+        updated_weights.append(weight + synchronized_grad)
+
+    # Update the global model with the new weights
+    global_model.set_weights(updated_weights)
+    return global_model
+
+    import matplotlib.pyplot as plt
+
+def plot_results(classical_results, quantum_results, metric):
+    """Plot comparison between classical and quantum approaches."""
+    epochs = range(len(classical_results))
+    plt.plot(epochs, classical_results, label='Classical')
+    plt.plot(epochs, quantum_results, label='Quantum-Synchronized')
+    plt.xlabel('Epochs')
+    plt.ylabel(metric)
+    plt.title(f'Federated Learning: {metric} Comparison')
+    plt.legend()
+    plt.show()
+
+plot_results(classical_accuracy, quantum_accuracy, 'Accuracy')
+
+#FROM python:3.8-slim WORKDIR /app COPY . . RUN pip install tensorflow qiskit numpy matplotlib CMD ["python", "main.py"]
+
+
+def simulate_client_update(global_model, quantum_metadata):
+    """Simulate client updates with quantum synchronization."""
+    # Retrieve current weights
+    current_weights = global_model.get_weights()
+
+    # Apply quantum synchronization gradient to each layer
+    updated_weights = []
+    for weight in current_weights:
+        # Generate synchronized gradient with the same shape as the layer weights
+        synchronized_grad = quantum_metadata * np.random.rand(*weight.shape)
+        updated_weights.append(weight + synchronized_grad)
+
+    # Update the global model with the new weights
+def simulate_client_update(global_model, quantum_metadata):
+    """Simulate client updates with quantum synchronization."""
+    # Retrieve current weights
+    current_weights = global_model.get_weights()
+
+    # Apply quantum synchronization gradient to each layer
+    updated_weights = []
+    for weight in current_weights:
+        # Generate synchronized gradient with the same shape as the layer weights
+        synchronized_grad = quantum_metadata * np.random.rand(*weight.shape)
+        updated_weights.append(weight + synchronized_grad)
+
+    # Update the global model with the new weights
+    global_model.set_weights(updated_weights)
+    return global_model
